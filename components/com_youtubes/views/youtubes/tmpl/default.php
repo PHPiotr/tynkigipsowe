@@ -22,25 +22,29 @@ if (count($this->items) > 0):
 							<ul>
 								<?php
 								foreach ($this->items as $key => $item):
-									$YTurl = "http://gdata.youtube.com/feeds/api/videos/" . $this->escape($item->link);
 
-									$YTxml = simplexml_load_file($YTurl);
-									$YTtitle = $YTxml->title[0];
-									$YTduration = (int) $YTxml->children('media', true)->group[0]->children('yt', true)->duration[0]->attributes('', true)->seconds;
-									$YThour = '';
-									$YTmin = (int) ($YTduration / 60);
-									if ($YTmin > 59) {
-										$YThour = (int) ($YTmin / 60) . ':';
-										$YTmin = $YTmin % 60;
+									$contents = file_get_contents("https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id={$item->link}&key={$this->api_key}");
+									$details =json_decode($contents, true);
+
+									if (empty($details['items'][0]['contentDetails']['duration'])) {
+										continue;
 									}
-									$YTs = $YTduration % 60;
-									$YTsec = $YTs < 9 ? "0" . $YTs : $YTs;
+
+									$duration = $details['items'][0]['contentDetails']['duration'];
+									$date = new DateTime('1970-01-01');
+									$date->add(new DateInterval($duration));
+
+									if (strpos($duration, 'H')) {
+										$format_duration = $date->format('H:i:s');
+									} else {
+										$format_duration = $date->format('i:s');
+									}
 									?>
 									<li>
 										<a class="thumb" id="<?php echo $this->escape($item->link); ?>" href="http://www.youtube.com/watch?v=<?php echo $this->escape($item->link); ?>" title="<?php echo $item->title; ?>">
 											<img title="<?php echo $item->title ?>" alt="<?php echo $item->title ?>" width="156" height="86" src='http://i1.ytimg.com/vi/<?php echo $this->escape($item->link); ?>/mqdefault.jpg' />
 											<span class="video title"><?php echo JHTML::_('string.truncate', ($item->title), 25); ?></span>
-											<span class="video time"><?php echo $YThour . $YTmin . ':' . $YTsec; ?></span>
+											<span class="video time"><?php echo $format_duration; ?></span>
 										</a>
 									</li>
 								<?php endforeach; ?>

@@ -28,7 +28,7 @@ defined('_JEXEC') or die;
 	<?php foreach ($list as $language) : ?>
 		<?php if ($params->get('show_active', 0) || !$language->active):?>
 			<li class="<?php echo $language->active ? 'lang-active' : '';?>" dir="<?php echo JLanguage::getInstance($language->lang_code)->isRTL() ? 'rtl' : 'ltr' ?>">
-			<a href="<?php echo strpos($language->link, '/cz/') !== false ? 'http://www.sadroveomitkydiamant.cz' : $language->link;?>">
+			<a href="<?php echo strpos($language->link, '/cz/') !== false ? 'https://www.sadroveomitkydiamant.cz' : $language->link;?>">
 			<?php if ($params->get('image', 1)):?>
 				<?php echo JHtml::_('image', 'mod_languages/' . $language->image . '.gif', $language->title_native, array('title' => $language->title_native), true);?>
 			<?php else : ?>
